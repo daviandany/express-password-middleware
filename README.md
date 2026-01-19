@@ -29,17 +29,28 @@ With this project, I consolidated my knowledge in:
 
 The application features a protected route that can only be accessed if the `correctPassword` middleware allows it.
 
-### The Validation Middleware
-This is the core function that controls access. It checks the request body before deciding the user's destination:
+### 1. Key Configuration
+Before handling requests, strict setup is required to ensure data parsing and file path resolution work in the **ES Modules** environment:
 
 ```javascript
+// 1. Body Parser: Middleware essential to parse the 'req.body' from HTML forms
+app.use(express.urlencoded({ extended: true }));
+
+// 2. Path Strategy: Recreating '__dirname' manually (since it's not available in ES6 Modules)
+const __dirname = dirname(fileURLToPath(import.meta.url));
+```
+### 2. The Validation Middleware
+This is the core function that controls access. It intercepts the request before passing it to the final route:
+
+```javaScript
+
 function correctPassword(req, res, next){
     console.log(req.body);
     thePassword = req.body.password; // Captures password from form
 
     if (thePassword === "ILoveProgramming"){
         console.log("Correct password")
-        return next(); // ✅ Authorized: Passes to the next function
+        return next(); // ✅ Authorized: Passes control to the next function
     } else {
         console.log("Incorrect Password");
         return res.status(401).send("<h1>Incorrect Password</h1>"); // ⛔ Denied
